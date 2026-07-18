@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TorneoPro - Gestor de Ligas</title>
+    <!-- Fuentes de Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Iconos de FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header>
+        <h1>Torneo<span>Pro</span></h1>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Gestiona tus ligas como un profesional</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- VISTA 1: LOGIN -->
+        <div id="view-login" class="view active">
+            <h2><i class="fa-solid fa-right-to-bracket"></i> Ingresa a tu cuenta</h2>
+            <div class="form-group">
+                <label for="username">Nombre de Usuario o Apodo</label>
+                <input type="text" id="username" placeholder="Ej. JuanPerez10" autocomplete="off">
+            </div>
+            <button onclick="app.login()">Entrar al Sistema <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+
+        <!-- VISTA 2: DASHBOARD (MIS TORNEOS) -->
+        <div id="view-dashboard" class="view">
+            <div class="top-bar">
+                <div class="user-info">
+                    <i class="fa-solid fa-user-circle" style="font-size: 1.5rem;"></i>
+                    <span id="display-user">Usuario</span>
+                </div>
+                <button class="secondary" style="width: auto; padding: 5px 10px; font-size: 0.8rem;" onclick="app.logout()">
+                    <i class="fa-solid fa-sign-out-alt"></i> Salir
+                </button>
+            </div>
+
+            <div class="tournament-header">
+                <h2><i class="fa-solid fa-trophy"></i> Mis Torneos</h2>
+                <button onclick="app.showCreateTournament()"><i class="fa-solid fa-plus"></i> Crear Torneo</button>
+            </div>
+
+            <div class="tournament-grid" id="tournament-list">
+                <!-- Los torneos se insertan aquí -->
+            </div>
+        </div>
+
+        <!-- VISTA 3: CREAR TORNEO -->
+        <div id="view-create" class="view">
+            <h2><i class="fa-solid fa-plus-circle"></i> Nuevo Torneo</h2>
+            <div class="form-group">
+                <label for="tourney-name">Nombre del Torneo</label>
+                <input type="text" id="tourney-name" placeholder="Ej. Copa Libertadores 2026">
+            </div>
+            <div class="form-group">
+                <label for="tourney-type">Tipo de Competición</label>
+                <select id="tourney-type">
+                    <option value="selecciones">Selecciones Nacionales (Sudamérica)</option>
+                    <option value="clubes">Clubes Europeos</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 2rem;">
+                <button class="secondary" onclick="app.navigate('view-dashboard')">Cancelar</button>
+                <button onclick="app.createTournament()"><i class="fa-solid fa-save"></i> Guardar Torneo</button>
+            </div>
+        </div>
+
+        <!-- VISTA 4: UNIRSE / ELEGIR EQUIPO -->
+        <div id="view-join" class="view">
+            <h2><i class="fa-solid fa-tshirt"></i> Selecciona tu Equipo</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Estás ingresando a: <strong id="join-tourney-name" style="color:white;"></strong></p>
+            
+            <div class="form-group">
+                <label for="team-select">¿A quién vas a representar?</label>
+                <select id="team-select">
+                    <!-- Opciones se llenan por JS -->
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="secondary" onclick="app.navigate('view-dashboard')">Volver</button>
+                <button onclick="app.joinTournament()"><i class="fa-solid fa-play"></i> Iniciar Torneo</button>
+            </div>
+        </div>
+
+        <!-- VISTA 5: TABLA DE POSICIONES -->
+        <div id="view-standings" class="view">
+            <div class="top-bar">
+                <h2 style="margin: 0;"><i class="fa-solid fa-list-ol"></i> <span id="standings-tourney-name">Torneo</span></h2>
+                <button class="secondary" style="width: auto;" onclick="app.navigate('view-dashboard')"><i class="fa-solid fa-arrow-left"></i> Volver</button>
+            </div>
+            
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 10px;">
+                <i class="fa-solid fa-info-circle"></i> Reglas: Victoria (3 pts), Empate (1 pt), Derrota (0 pts).
+            </p>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th style="text-align: left;">Equipo</th>
+                            <th>PJ</th>
+                            <th>V</th>
+                            <th>E</th>
+                            <th>D</th>
+                            <th>GF</th>
+                            <th>GC</th>
+                            <th>DF</th>
+                            <th class="pts-col">Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Datos de la tabla -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <script src="script.js"></script>
+    </div>
