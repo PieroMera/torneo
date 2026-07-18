@@ -1,0 +1,294 @@
+:root {
+    --primary-color: #0a192f;
+    --secondary-color: #1e2a47;
+    --accent-color: #64ffda;
+    --text-color: #ccd6f6;
+    --text-secondary-color: #8892b0;
+    --card-bg: #112240;
+    --border-radius: 8px;
+    --box-shadow: 0 10px 30px -15px rgba(2, 12, 27, 0.7);
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    color: var(--accent-color);
+    text-shadow: 0 0 10px var(--accent-color);
+    margin-bottom: 0.25rem;
+}
+
+.subtitle {
+    color: var(--text-secondary-color);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--box-shadow);
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card h2 {
+    color: var(--accent-color);
+    margin-top: 0;
+    border-bottom: 1px solid var(--secondary-color);
+    padding-bottom: 1rem;
+}
+
+.form-crear-torneo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.form-crear-torneo input {
+    flex: 1 1 250px;
+}
+
+.form-crear-torneo input,
+.form-crear-torneo select {
+    padding: 0.8rem;
+    border: 1px solid var(--secondary-color);
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+}
+
+.form-crear-torneo input:focus,
+.form-crear-torneo select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+button {
+    padding: 0.8rem 1.5rem;
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s, opacity 0.2s;
+}
+
+button:hover {
+    background-color: #52d8c3;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.hint {
+    color: var(--text-secondary-color);
+    font-size: 0.9rem;
+}
+
+.hint.small {
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+.hint.success {
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+.lista-torneos {
+    list-style: none;
+    padding: 0;
+}
+
+.lista-torneos li {
+    background-color: var(--secondary-color);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.lista-torneos li:hover {
+    background-color: #29385c;
+}
+
+.torneo-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.torneo-nombre {
+    color: var(--text-color);
+    font-weight: bold;
+}
+
+.torneo-tipo {
+    color: var(--text-secondary-color);
+    font-size: 0.8rem;
+}
+
+.badge {
+    background-color: var(--primary-color);
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.error-container {
+    text-align: center;
+    color: #ff6b6b;
+    background-color: rgba(255, 107, 107, 0.1);
+    border: 1px solid #ff6b6b;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 2rem;
+}
+
+/* Estilos para TorneoPage */
+.torneo-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    text-align: left;
+}
+
+.torneo-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: var(--accent-color);
+}
+
+.back-button {
+    background: var(--secondary-color);
+    color: var(--accent-color);
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.grupo-bloque {
+    margin-bottom: 2rem;
+}
+
+.grupo-bloque:last-child {
+    margin-bottom: 0;
+}
+
+.grupo-bloque h3 {
+    color: var(--text-color);
+    margin: 0 0 0.75rem;
+    font-size: 1.05rem;
+}
+
+.torneo-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+@media (max-width: 900px) {
+    .torneo-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th, td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--secondary-color);
+}
+
+th {
+    color: var(--text-secondary-color);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+tbody tr:hover {
+    background-color: var(--secondary-color);
+}
+
+.management-forms {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.management-forms input, .management-forms select {
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--secondary-color);
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.form-partido {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.partido-equipos {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.vs {
+    text-align: center;
+    font-weight: bold;
+    color: var(--accent-color);
+}
