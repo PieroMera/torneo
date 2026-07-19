@@ -36,7 +36,11 @@ public class Torneo {
 
     @OneToMany(mappedBy = "torneo", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<Equipo> equipos;
+    private List<Equipo> equipos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "torneo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Partido> partidos = new ArrayList<>();
 
     // Se ejecuta automáticamente antes de insertar en la BD
     @PrePersist

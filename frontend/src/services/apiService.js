@@ -40,4 +40,6 @@ export const apiService = {
     getTablaDePosiciones: (torneoId) => request(`/torneos/${torneoId}/equipos`),
     addEquipo: (torneoId, equipo) => request(`/torneos/${torneoId}/equipos`, { body: equipo }),
     registrarResultado: (resultado) => request('/partidos/resultado', { body: resultado }),
+    generarPartidos: (torneoId) => request(`/torneos/${torneoId}/generar-partidos`, { method: 'POST' }),
+    getPartidos: (torneoId) => request(`/torneos/${torneoId}/partidos`),
 };

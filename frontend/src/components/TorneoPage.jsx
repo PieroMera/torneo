@@ -13,6 +13,17 @@ function agruparPorGrupo(equipos) {
         .map((nombre) => ({ nombre, equipos: grupos[nombre] }));
 }
 
+function agruparPartidosPorGrupo(partidos) {
+    const grupos = {};
+    for (const partido of partidos) {
+        const clave = partido.grupo || 'Sin grupo';
+        if (!grupos[clave]) grupos[clave] = [];
+        grupos[clave].push(partido);
+    }
+    return Object.keys(grupos).sort().map(nombre => ({ nombre, partidos: grupos[nombre] }));
+}
+
+
 function TorneoPage({ torneoId, onBack }) {
     const [torneo, setTorneo] = useState(null);
     const [equipos, setEquipos] = useState([]);
@@ -29,16 +40,20 @@ function TorneoPage({ torneoId, onBack }) {
     const [golesLocal, setGolesLocal] = useState(0);
     const [golesVisitante, setGolesVisitante] = useState(0);
     const [registrando, setRegistrando] = useState(false);
+    const [partidos, setPartidos] = useState([]);
+    const [generandoPartidos, setGenerandoPartidos] = useState(false);
 
     const cargarDatos = useCallback(async () => {
         try {
             setLoading(true);
-            const [torneoData, equiposData] = await Promise.all([
+            const [torneoData, equiposData, partidosData] = await Promise.all([
                 apiService.getTorneoById(torneoId),
                 apiService.getTablaDePosiciones(torneoId),
+                apiService.getPartidos(torneoId),
             ]);
             setTorneo(torneoData);
             setEquipos(equiposData);
+            setPartidos(partidosData);
             setError(null);
         } catch (err) {
             setError('Error al cargar el torneo. Asegúrate de que el backend esté funcionando.');
@@ -100,6 +115,20 @@ function TorneoPage({ torneoId, onBack }) {
         }
     };
 
+    const handleGenerarPartidos = async () => {
+        try {
+            setGenerandoPartidos(true);
+            setActionError(null);
+            await apiService.generarPartidos(torneoId);
+            await cargarDatos(); // Recargar todo
+        } catch (err) {
+            setActionError('Error al generar los partidos. Asegúrate de que los grupos estén completos.');
+            console.error(err);
+        } finally {
+            setGenerandoPartidos(false);
+        }
+    };
+
     if (loading && !torneo) {
         return (
             <div className="container">
@@ -118,6 +147,7 @@ function TorneoPage({ torneoId, onBack }) {
     }
 
     const gruposDePosiciones = agruparPorGrupo(equipos);
+    const gruposDePartidos = agruparPartidosPorGrupo(partidos);
 
     return (
         <div className="container">
@@ -132,54 +162,6 @@ function TorneoPage({ torneoId, onBack }) {
             {actionError && <div className="error-container"><p>{actionError}</p></div>}
 
             <div className="torneo-grid">
-                <div className="card">
-                    <h2>Tabla de Posiciones por Grupo</h2>
-                    {gruposDePosiciones.length === 0 ? (
-                        <p className="hint">Todavía no hay equipos inscritos. ¡Sé el primero en unirte!</p>
-                    ) : (
-                        gruposDePosiciones.map((grupo) => (
-                            <div key={grupo.nombre} className="grupo-bloque">
-                                <h3>Grupo {grupo.nombre}</h3>
-                                <div className="table-responsive">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Equipo</th>
-                                                <th>PJ</th>
-                                                <th>PTS</th>
-                                                <th>V</th>
-                                                <th>E</th>
-                                                <th>D</th>
-                                                <th>GF</th>
-                                                <th>GC</th>
-                                                <th>DF</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {grupo.equipos.map((equipo) => (
-                                                <tr key={equipo.id}>
-                                                    <td>{equipo.name}</td>
-                                                    <td>{equipo.v + equipo.e + equipo.d}</td>
-                                                    <td><strong>{equipo.pts}</strong></td>
-                                                    <td>{equipo.v}</td>
-                                                    <td>{equipo.e}</td>
-                                                    <td>{equipo.d}</td>
-                                                    <td>{equipo.gf}</td>
-                                                    <td>{equipo.gc}</td>
-                                                    <td>{equipo.df}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                                {grupo.equipos.length < 4 && (
-                                    <p className="hint small">Faltan {4 - grupo.equipos.length} equipo(s) para completar este grupo.</p>
-                                )}
-                            </div>
-                        ))
-                    )}
-                </div>
-
                 <div className="management-forms">
                     <div className="card">
                         <h2>Unirse al Torneo</h2>
@@ -229,6 +211,86 @@ function TorneoPage({ torneoId, onBack }) {
                         </form>
                     </div>
                 </div>
+                <div className="card">
+                    <h2>Tabla de Posiciones por Grupo</h2>
+                    {gruposDePosiciones.length === 0 ? (
+                        <p className="hint">Todavía no hay equipos inscritos. ¡Sé el primero en unirte!</p>
+                    ) : (
+                        gruposDePosiciones.map((grupo) => (
+                            <div key={grupo.nombre} className="grupo-bloque">
+                                <h3>Grupo {grupo.nombre}</h3>
+                                <div className="table-responsive">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Equipo</th>
+                                                <th>PJ</th>
+                                                <th>PTS</th>
+                                                <th>V</th>
+                                                <th>E</th>
+                                                <th>D</th>
+                                                <th>GF</th>
+                                                <th>GC</th>
+                                                <th>DF</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {grupo.equipos.map((equipo) => (
+                                                <tr key={equipo.id}>
+                                                    <td>{equipo.name}</td>
+                                                    <td>{equipo.v + equipo.e + equipo.d}</td>
+                                                    <td><strong>{equipo.pts}</strong></td>
+                                                    <td>{equipo.v}</td>
+                                                    <td>{equipo.e}</td>
+                                                    <td>{equipo.d}</td>
+                                                    <td>{equipo.gf}</td>
+                                                    <td>{equipo.gc}</td>
+                                                    <td>{equipo.df}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {grupo.equipos.length < 4 && (
+                                    <p className="hint small">Faltan {4 - grupo.equipos.length} equipo(s) para completar este grupo.</p>
+                                )}
+                            </div>
+                        ))
+                    )}
+                </div>
+
+                <div className="card">
+                    <h2>Partidos</h2>
+                    {partidos.length === 0 ? (
+                        <>
+                            <p className="hint">
+                                Una vez que todos los grupos estén completos (4 equipos por grupo), podrás generar el fixture de partidos.
+                            </p>
+                            <button onClick={handleGenerarPartidos} disabled={generandoPartidos}>
+                                {generandoPartidos ? 'Generando...' : 'Generar Partidos'}
+                            </button>
+                        </>
+                    ) : (
+                        gruposDePartidos.map(grupo => (
+                            <div key={grupo.nombre} className="grupo-bloque">
+                                <h3>Partidos Grupo {grupo.nombre}</h3>
+                                <ul className="lista-partidos">
+                                    {grupo.partidos.map(partido => (
+                                        <li key={partido.id} className={`partido-item ${partido.status.toLowerCase()}`}>
+                                            <span className="equipo-local">{partido.equipoLocal.name}</span>
+                                            <span className="resultado">
+                                                {partido.status === 'JUGADO' ? `${partido.golesLocal} - ${partido.golesVisitante}` : 'vs'}
+                                            </span>
+                                            <span className="equipo-visitante">{partido.equipoVisitante.name}</span>
+                                            <span className="status-partido">{partido.status}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ))
+                    )}
+                </div>
+
             </div>
         </div>
     );

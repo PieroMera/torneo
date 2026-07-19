@@ -2,8 +2,10 @@ package com.torneopro.backend.services;
 
 import com.torneopro.backend.dtos.ResultadoPartidoDTO;
 import com.torneopro.backend.models.Equipo;
+import com.torneopro.backend.models.Partido;
 import com.torneopro.backend.models.Torneo;
 import com.torneopro.backend.repositories.EquipoRepository;
+import com.torneopro.backend.repositories.PartidoRepository;
 import com.torneopro.backend.repositories.TorneoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -20,10 +22,12 @@ public class EquipoServiceImpl implements EquipoService {
 
     private final EquipoRepository equipoRepository;
     private final TorneoRepository torneoRepository;
+    private final PartidoRepository partidoRepository;
 
-    public EquipoServiceImpl(EquipoRepository equipoRepository, TorneoRepository torneoRepository) {
+    public EquipoServiceImpl(EquipoRepository equipoRepository, TorneoRepository torneoRepository, PartidoRepository partidoRepository) {
         this.equipoRepository = equipoRepository;
         this.torneoRepository = torneoRepository;
+        this.partidoRepository = partidoRepository;
     }
 
     @Override
@@ -94,5 +98,18 @@ public class EquipoServiceImpl implements EquipoService {
         // Guardados en la misma transacción: si falla uno, se revierte el otro
         equipoRepository.save(local);
         equipoRepository.save(visitante);
+
+        // Actualizar estado del partido
+        local.getTorneo().getPartidos().stream()
+                .filter(p -> p.getEquipoLocal().getId().equals(local.getId()) &&
+                              p.getEquipoVisitante().getId().equals(visitante.getId()) &&
+                              p.getStatus() == Partido.StatusPartido.PENDIENTE)
+                .findFirst()
+                .ifPresent(partido -> {
+                    partido.setGolesLocal(resultado.getGolesLocal());
+                    partido.setGolesVisitante(resultado.getGolesVisitante());
+                    partido.setStatus(Partido.StatusPartido.JUGADO);
+                    partidoRepository.save(partido);
+                });
     }
 }

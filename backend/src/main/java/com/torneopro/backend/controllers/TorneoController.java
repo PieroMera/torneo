@@ -1,8 +1,10 @@
 package com.torneopro.backend.controllers;
 
 import com.torneopro.backend.models.Equipo;
+import com.torneopro.backend.models.Partido;
 import com.torneopro.backend.models.Torneo; // Import faltante
 import com.torneopro.backend.services.EquipoService;
+import com.torneopro.backend.services.PartidoService;
 import com.torneopro.backend.services.TorneoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,11 +21,13 @@ public class TorneoController {
 
     private final TorneoService torneoService;
     private final EquipoService equipoService;
+    private final PartidoService partidoService;
 
     @Autowired
-    public TorneoController(TorneoService torneoService, EquipoService equipoService) {
+    public TorneoController(TorneoService torneoService, EquipoService equipoService, PartidoService partidoService) {
         this.torneoService = torneoService;
         this.equipoService = equipoService;
+        this.partidoService = partidoService;
     }
 
     // GET: Obtener todos los torneos
@@ -62,5 +66,21 @@ public class TorneoController {
             return ResponseEntity.ok(equipos);
         }
         return ResponseEntity.notFound().build();
+    }
+
+    // POST /api/torneos/{id}/generar-partidos - Genera los partidos para el torneo
+    @PostMapping("/{id}/generar-partidos")
+    public ResponseEntity<List<Partido>> generarPartidos(@PathVariable Long id) {
+        try {
+            List<Partido> partidos = partidoService.generarPartidosTorneo(id);
+            return ResponseEntity.ok(partidos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/{id}/partidos")
+    public ResponseEntity<List<Partido>> getPartidosDelTorneo(@PathVariable Long id) {
+        return ResponseEntity.ok(partidoService.getPartidosByTorneoId(id));
     }
 }
