@@ -3,9 +3,11 @@ package com.torneopro.backend.services;
 import com.torneopro.backend.models.Equipo;
 import com.torneopro.backend.models.Torneo;
 import com.torneopro.backend.repositories.EquipoRepository;
+import com.torneopro.backend.repositories.PartidoRepository;
 import com.torneopro.backend.repositories.TorneoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,10 +17,12 @@ public class TorneoServiceImpl implements TorneoService {
 
     private final TorneoRepository torneoRepository;
     private final EquipoRepository equipoRepository;
+    private final PartidoRepository partidoRepository;
 
-    public TorneoServiceImpl(TorneoRepository torneoRepository, EquipoRepository equipoRepository) {
+    public TorneoServiceImpl(TorneoRepository torneoRepository, EquipoRepository equipoRepository, PartidoRepository partidoRepository) {
         this.torneoRepository = torneoRepository;
         this.equipoRepository = equipoRepository;
+        this.partidoRepository = partidoRepository;
     }
 
     @Override
@@ -42,5 +46,15 @@ public class TorneoServiceImpl implements TorneoService {
             throw new EntityNotFoundException("Torneo no encontrado con id: " + torneoId);
         }
         return equipoRepository.findByTorneoIdOrderByStandings(torneoId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteTorneo(Long id) {
+        if (!torneoRepository.existsById(id)) {
+            throw new EntityNotFoundException("Torneo no encontrado con id: " + id);
+        }
+        partidoRepository.deleteByTorneoId(id);
+        torneoRepository.deleteById(id);
     }
 }

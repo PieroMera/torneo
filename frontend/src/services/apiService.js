@@ -37,6 +37,7 @@ export const apiService = {
     getTorneos: () => request('/torneos'),
     getTorneoById: (id) => request(`/torneos/${id}`),
     createTorneo: (torneo) => request('/torneos', { body: torneo }),
+    deleteTorneo: (torneoId) => request(`/torneos/${torneoId}`, { method: 'DELETE' }),
     getTablaDePosiciones: (torneoId) => request(`/torneos/${torneoId}/equipos`),
     addEquipo: (torneoId, equipo) => request(`/torneos/${torneoId}/equipos`, { body: equipo }),
     registrarResultado: (resultado) => request('/partidos/resultado', { body: resultado }),

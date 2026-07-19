@@ -11,4 +11,5 @@ public interface TorneoService {
     Optional<Torneo> findById(Long id);
     Torneo createTorneo(Torneo torneo);
     List<Equipo> getTablaDePosiciones(Long torneoId);
+    void deleteTorneo(Long id);
 }

@@ -83,4 +83,17 @@ public class TorneoController {
     public ResponseEntity<List<Partido>> getPartidosDelTorneo(@PathVariable Long id) {
         return ResponseEntity.ok(partidoService.getPartidosByTorneoId(id));
     }
+
+    // DELETE /api/torneos/{id} - Elimina un torneo y todo lo asociado (equipos, partidos)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTorneo(@PathVariable Long id) {
+        try {
+            torneoService.deleteTorneo(id);
+            return ResponseEntity.noContent().build();
+        } catch (jakarta.persistence.EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

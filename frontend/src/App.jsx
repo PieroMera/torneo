@@ -13,6 +13,7 @@ function App() {
     const [nuevoTorneoTipo, setNuevoTorneoTipo] = useState('Selecciones');
 
     const [selectedTorneoId, setSelectedTorneoId] = useState(null);
+    const [eliminandoId, setEliminandoId] = useState(null);
 
     const fetchTorneos = async () => {
         try {
@@ -46,6 +47,22 @@ function App() {
             console.error(err);
         } finally {
             setCreando(false);
+        }
+    };
+
+    const handleEliminarTorneo = async (torneo) => {
+        if (!window.confirm(`¿Eliminar el torneo "${torneo.name}"? Se borrarán también sus equipos y partidos.`)) {
+            return;
+        }
+        try {
+            setEliminandoId(torneo.id);
+            await apiService.deleteTorneo(torneo.id);
+            setTorneos((prev) => prev.filter((t) => t.id !== torneo.id));
+        } catch (err) {
+            setError('Error al eliminar el torneo.');
+            console.error(err);
+        } finally {
+            setEliminandoId(null);
         }
     };
 
@@ -111,6 +128,17 @@ function App() {
                                         <span className="torneo-tipo">{torneo.type}</span>
                                     </div>
                                     <span className="badge">{torneo.status}</span>
+                                    <button
+                                        type="button"
+                                        className="delete-button"
+                                        disabled={eliminandoId === torneo.id}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEliminarTorneo(torneo);
+                                        }}
+                                    >
+                                        {eliminandoId === torneo.id ? 'Eliminando…' : 'Eliminar'}
+                                    </button>
                                 </li>
                             ))}
                         </ul>

@@ -173,6 +173,20 @@ button:disabled {
     white-space: nowrap;
 }
 
+.delete-button {
+    background-color: transparent;
+    color: #ff6b6b;
+    border: 1px solid #ff6b6b;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.75rem;
+    margin-left: 0.75rem;
+    flex-shrink: 0;
+}
+
+.delete-button:hover {
+    background-color: rgba(255, 107, 107, 0.15);
+}
+
 .error-container {
     text-align: center;
     color: #ff6b6b;
