@@ -2,8 +2,12 @@ import { useState, useEffect } from 'react';
 import { apiService } from './services/apiService';
 import './App.css';
 import TorneoPage from './components/TorneoPage';
+import LoginPage from './components/LoginPage';
+import ProfilePage from './components/ProfilePage';
 
 function App() {
+    const [userEmail, setUserEmail] = useState(() => localStorage.getItem('torneoProUser'));
+    const [showProfile, setShowProfile] = useState(false);
     const [torneos, setTorneos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -30,15 +34,35 @@ function App() {
     };
 
     useEffect(() => {
-        fetchTorneos();
-    }, []);
+        if (userEmail) fetchTorneos();
+    }, [userEmail]);
+
+    const handleLogin = (email) => {
+        localStorage.setItem('torneoProUser', email);
+        setUserEmail(email);
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('torneoProUser');
+        setSelectedTorneoId(null);
+        setShowProfile(false);
+        setUserEmail(null);
+    };
+
+    if (!userEmail) {
+        return <LoginPage onLogin={handleLogin} />;
+    }
+
+    if (showProfile) {
+        return <ProfilePage email={userEmail} onBack={() => setShowProfile(false)} />;
+    }
 
     const handleCrearTorneo = async (e) => {
         e.preventDefault();
         if (!nuevoTorneoNombre.trim()) return;
         try {
             setCreando(true);
-            const nuevoTorneo = { name: nuevoTorneoNombre.trim(), type: nuevoTorneoTipo };
+            const nuevoTorneo = { name: nuevoTorneoNombre.trim(), type: nuevoTorneoTipo, creadorEmail: userEmail };
             const torneoCreado = await apiService.createTorneo(nuevoTorneo);
             setTorneos((prev) => [...prev, torneoCreado]);
             setNuevoTorneoNombre('');
@@ -70,6 +94,7 @@ function App() {
         return (
             <TorneoPage
                 torneoId={selectedTorneoId}
+                userEmail={userEmail}
                 onBack={() => {
                     setSelectedTorneoId(null);
                     fetchTorneos();
@@ -83,6 +108,10 @@ function App() {
             <header>
                 <h1>🏆 TorneoPRO</h1>
                 <p className="subtitle">Crea torneos de fútbol, únete con tu equipo y sigue la fase de grupos en vivo</p>
+                <div className="user-menu">
+                    <button type="button" className="profile-button" onClick={() => setShowProfile(true)}>Mi perfil</button>
+                    <button type="button" className="logout-button" onClick={handleLogout}>Cerrar sesión</button>
+                </div>
             </header>
 
             {error && (
@@ -126,6 +155,7 @@ function App() {
                                     <div className="torneo-info">
                                         <span className="torneo-nombre">{torneo.name}</span>
                                         <span className="torneo-tipo">{torneo.type}</span>
+                                        <span className="creado-por">Creado por: {torneo.creadoPor || 'Usuario desconocido'}</span>
                                     </div>
                                     <span className="badge">{torneo.status}</span>
                                     <button

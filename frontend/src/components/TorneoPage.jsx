@@ -24,7 +24,7 @@ function agruparPartidosPorGrupo(partidos) {
 }
 
 
-function TorneoPage({ torneoId, onBack }) {
+function TorneoPage({ torneoId, onBack, userEmail }) {
     const [torneo, setTorneo] = useState(null);
     const [equipos, setEquipos] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -73,7 +73,7 @@ function TorneoPage({ torneoId, onBack }) {
         try {
             setUniendo(true);
             setActionError(null);
-            const nuevoEquipo = { name: nuevoEquipoNombre.trim() };
+            const nuevoEquipo = { name: nuevoEquipoNombre.trim(), creadorEmail: userEmail };
             const equipoCreado = await apiService.addEquipo(torneoId, nuevoEquipo);
             setUltimoGrupoAsignado(equipoCreado.grupo);
             setNuevoEquipoNombre('');
@@ -155,7 +155,7 @@ function TorneoPage({ torneoId, onBack }) {
                 <button onClick={onBack} className="back-button">← Volver</button>
                 <div>
                     <h1>{torneo?.name}</h1>
-                    <p className="subtitle">{torneo?.type} · {torneo?.status} · Fase de grupos (4 equipos por grupo)</p>
+                    <p className="subtitle">{torneo?.type} · {torneo?.status} · Creado por {torneo?.creadoPor || 'Usuario desconocido'}</p>
                 </div>
             </header>
 
@@ -237,7 +237,7 @@ function TorneoPage({ torneoId, onBack }) {
                                         <tbody>
                                             {grupo.equipos.map((equipo) => (
                                                 <tr key={equipo.id}>
-                                                    <td>{equipo.name}</td>
+                                                    <td>{equipo.name}<span className="creado-por table-creator">Creado por: {equipo.creadoPor || 'Usuario desconocido'}</span></td>
                                                     <td>{equipo.v + equipo.e + equipo.d}</td>
                                                     <td><strong>{equipo.pts}</strong></td>
                                                     <td>{equipo.v}</td>
@@ -277,12 +277,15 @@ function TorneoPage({ torneoId, onBack }) {
                                 <ul className="lista-partidos">
                                     {grupo.partidos.map(partido => (
                                         <li key={partido.id} className={`partido-item ${partido.status.toLowerCase()}`}>
-                                            <span className="equipo-local">{partido.equipoLocal.name}</span>
-                                            <span className="resultado">
-                                                {partido.status === 'JUGADO' ? `${partido.golesLocal} - ${partido.golesVisitante}` : 'vs'}
-                                            </span>
-                                            <span className="equipo-visitante">{partido.equipoVisitante.name}</span>
-                                            <span className="status-partido">{partido.status}</span>
+                                            <div className="match-main">
+                                                <span className="equipo-local">{partido.equipoLocal.name}</span>
+                                                <span className="resultado">{partido.status === 'JUGADO' ? `${partido.golesLocal} - ${partido.golesVisitante}` : 'VS'}</span>
+                                                <span className="equipo-visitante">{partido.equipoVisitante.name}</span>
+                                            </div>
+                                            <div className="match-footer">
+                                                <span className="creado-por">Organizado por {partido.creadoPor || 'Usuario desconocido'}</span>
+                                                <span className="status-partido">{partido.status === 'JUGADO' ? 'Finalizado' : 'Pendiente'}</span>
+                                            </div>
                                         </li>
                                     ))}
                                 </ul>

@@ -31,6 +31,12 @@ public class Torneo {
     @Column(length = 50)
     private String status; // Ej: "Activo", "Inscripción"
 
+    @Column(name = "creado_por", length = 170)
+    private String creadoPor;
+
+    @Transient
+    private String creadorEmail;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 

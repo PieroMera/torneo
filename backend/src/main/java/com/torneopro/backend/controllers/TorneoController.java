@@ -3,6 +3,7 @@ package com.torneopro.backend.controllers;
 import com.torneopro.backend.models.Equipo;
 import com.torneopro.backend.models.Partido;
 import com.torneopro.backend.models.Torneo; // Import faltante
+import com.torneopro.backend.repositories.UsuarioRepository;
 import com.torneopro.backend.services.EquipoService;
 import com.torneopro.backend.services.PartidoService;
 import com.torneopro.backend.services.TorneoService;
@@ -22,12 +23,14 @@ public class TorneoController {
     private final TorneoService torneoService;
     private final EquipoService equipoService;
     private final PartidoService partidoService;
+    private final UsuarioRepository usuarioRepository;
 
     @Autowired
-    public TorneoController(TorneoService torneoService, EquipoService equipoService, PartidoService partidoService) {
+    public TorneoController(TorneoService torneoService, EquipoService equipoService, PartidoService partidoService, UsuarioRepository usuarioRepository) {
         this.torneoService = torneoService;
         this.equipoService = equipoService;
         this.partidoService = partidoService;
+        this.usuarioRepository = usuarioRepository;
     }
 
     // GET: Obtener todos los torneos
@@ -50,11 +53,19 @@ public class TorneoController {
     public ResponseEntity<Torneo> createTorneo(@RequestBody Torneo nuevoTorneo) {
         try {
             nuevoTorneo.setId(null);
+            nuevoTorneo.setCreadoPor(nombreCreador(nuevoTorneo.getCreadorEmail()));
             Torneo torneoGuardado = torneoService.createTorneo(nuevoTorneo);
             return new ResponseEntity<>(torneoGuardado, HttpStatus.CREATED);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    private String nombreCreador(String email) {
+        if (email == null) return "Usuario desconocido";
+        return usuarioRepository.findByEmail(email.trim().toLowerCase())
+                .map(usuario -> usuario.getNombre() + " " + usuario.getApellido())
+                .orElse("Usuario desconocido");
     }
 
     // GET /api/torneos/{id}/equipos - Devuelve la tabla de posiciones de un torneo

@@ -54,6 +54,7 @@ public class PartidoServiceImpl implements PartidoService {
 
                         Partido partido = new Partido();
                         partido.setTorneo(torneo);
+                        partido.setCreadoPor(torneo.getCreadoPor());
                         partido.setGrupo(entry.getKey());
                         partido.setEquipoLocal(local);
                         partido.setEquipoVisitante(visitante);

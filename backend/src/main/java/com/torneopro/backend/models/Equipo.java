@@ -48,4 +48,10 @@ public class Equipo {
 
     @Column(name = "grupo", length = 20)
     private String grupo;
+
+    @Column(name = "creado_por", length = 170)
+    private String creadoPor;
+
+    @Transient
+    private String creadorEmail;
 }

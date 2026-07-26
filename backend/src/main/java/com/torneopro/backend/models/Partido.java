@@ -38,6 +38,9 @@ public class Partido {
     @Column(length = 20)
     private String grupo;
 
+    @Column(name = "creado_por", length = 170)
+    private String creadoPor;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private StatusPartido status = StatusPartido.PENDIENTE;

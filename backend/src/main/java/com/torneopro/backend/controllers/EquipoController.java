@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.torneopro.backend.dtos.ResultadoPartidoDTO;
 import com.torneopro.backend.models.Equipo;
 import com.torneopro.backend.services.EquipoService;
+import com.torneopro.backend.repositories.UsuarioRepository;
 
 @RestController
 @RequestMapping("/api")
@@ -20,9 +21,11 @@ import com.torneopro.backend.services.EquipoService;
 public class EquipoController {
 
     private final EquipoService equipoService;
+    private final UsuarioRepository usuarioRepository;
 
-    public EquipoController(EquipoService equipoService) {
+    public EquipoController(EquipoService equipoService, UsuarioRepository usuarioRepository) {
         this.equipoService = equipoService;
+        this.usuarioRepository = usuarioRepository;
     }
 
     // POST /api/torneos/{id}/equipos - Añade un nuevo equipo a un torneo
@@ -30,6 +33,7 @@ public class EquipoController {
     public ResponseEntity<Equipo> addEquipo(@PathVariable Long torneoId, @RequestBody Equipo nuevoEquipo) {
         try {
             nuevoEquipo.setId(null);
+            nuevoEquipo.setCreadoPor(nombreCreador(nuevoEquipo.getCreadorEmail()));
             Equipo equipoGuardado = equipoService.addEquipoToTorneo(torneoId, nuevoEquipo);
             return new ResponseEntity<>(equipoGuardado, HttpStatus.CREATED);
         } catch (EntityNotFoundException e) {
@@ -37,6 +41,13 @@ public class EquipoController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    private String nombreCreador(String email) {
+        if (email == null) return "Usuario desconocido";
+        return usuarioRepository.findByEmail(email.trim().toLowerCase())
+                .map(usuario -> usuario.getNombre() + " " + usuario.getApellido())
+                .orElse("Usuario desconocido");
     }
 
     // POST /api/partidos/resultado - Registra el resultado de un partido

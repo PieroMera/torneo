@@ -26,7 +26,8 @@ async function request(endpoint, options = {}) {
         if (response.status === 204 || response.headers.get('Content-Length') === '0') {
             return; // No content
         }
-        return await response.json();
+        const contentType = response.headers.get('Content-Type') || '';
+        return contentType.includes('application/json') ? await response.json() : await response.text();
     } catch (error) {
         console.error('Error en el servicio API:', error);
         throw error;
@@ -34,6 +35,9 @@ async function request(endpoint, options = {}) {
 }
 
 export const apiService = {
+    register: (credentials) => request('/auth/register', { body: credentials }),
+    login: (credentials) => request('/auth/login', { body: credentials }),
+    getProfile: (email) => request(`/auth/profile?email=${encodeURIComponent(email)}`),
     getTorneos: () => request('/torneos'),
     getTorneoById: (id) => request(`/torneos/${id}`),
     createTorneo: (torneo) => request('/torneos', { body: torneo }),
